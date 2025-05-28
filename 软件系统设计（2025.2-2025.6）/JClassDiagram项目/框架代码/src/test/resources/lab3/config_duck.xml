@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+    <analyzers>
+        <analyzer>CircularDependencyAnalyzer</analyzer>
+        <analyzer>ClassAnalyzer</analyzer>
+        <analyzer>DesignPatternAnalyzer</analyzer>
+    </analyzers>
+</configuration>
