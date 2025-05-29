@@ -1,0 +1,155 @@
+%\documentclass[a4paper]{article}
+%\usepackage{geometry}
+%\geometry{a4paper,scale=0.8}
+\documentclass[8pt]{article}
+\usepackage{ctex}
+\usepackage{indentfirst}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage[a4paper, total={6in, 8in}]{geometry}
+\usepackage{CJK}
+\usepackage[fleqn]{amsmath}
+\usepackage{parskip}
+\usepackage{listings}
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+
+% 设置页眉
+\fancyhead[L]{2025年春季}
+\fancyhead[C]{自然语言处理}
+\fancyhead[R]{作业二}
+
+
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{multicol}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{hyperref}
+
+\titleformat{\section}
+  {\normalfont\Large\bfseries}
+  {\thesection}{1em}{}
+\renewcommand{\thesection}{\Roman{section}.}
+
+\newcommand{\points}[1]{\textbf{(#1 points)}}
+
+\definecolor{gray}{rgb}{0.5, 0.5, 0.5}
+
+\hypersetup{
+    colorlinks,
+    citecolor=[rgb]{0.00, 0.45, 0.70},
+    linkcolor=[rgb]{0.01, 0.62, 0.45},
+    urlcolor=[rgb]{0.80, 0.47, 0.74},
+}
+
+
+\begin{document}
+
+\textbf{\color{blue} \Large 姓名：张三 \ \ \ 学号：123456789 \ \ \ \today}
+
+\section{动态词嵌入 \points{22}}
+
+{\color{gray}\begin{enumerate}
+    \item 什么是动态词嵌入? \points{2} 相比静态词嵌入, 使用动态词嵌入有什么优势? \points{4}
+    \item 在拥有相同大小词表的情况下, 分析比较静态词嵌入和动态词嵌入在使用时的计算效率. \points{3}
+    \item CoVe 和 ELMo 分别使用什么预训练任务来训练动态词嵌入? \points{3} 他们选择这些预训练任务的动机分别是什么? \points{4}
+    \item ELMo 在预训练时使用交叉熵 (Cross Entropy) 作为损失函数. 请分别给出 ELMo 在训练动态词嵌入时所使用的前向语言模型和后向语言模型的损失函数公式. \points{6}
+    
+    \textbf{[提示 1]} 交叉熵损失是一种常用的训练分类模型的损失函数. 它的定义为
+    \begin{equation}
+        \mathcal{L}_\text{CE} = -\sum_{i=1}^N y_i\log p_i \ .
+    \end{equation}
+    其中, $N$ 为类别数; $y_i$ 为第 $i$ 个类别的真实标签 ($y_i=1$ 表示样本属于该类别, 否则 $y_i=0$); $p_i\in[0,1]$ 为模型预测的该样本属于第 $i$ 个类别的概率, 并满足 $\sum_{i=0}^N p_i=1$. 
+
+    \textbf{[提示 2]} 对于一个长度为 $L$ 的句子, ELMo 使用的前向语言模型和后向语言模型分别表示为
+    \begin{align}
+        \overset{\rightharpoonup}{P}(w_1, w_2, \cdots, w_L) = \prod_{t=1}^L P(w_t|\mathbf{x}_{1:t-1};\overset{\rightharpoonup}{\boldsymbol{\theta}}_\text{LSTM}, \boldsymbol{\theta}_\text{out}) \ , \\
+        \overset{\leftharpoonup}{P}(w_1, w_2, \cdots, w_L) = \prod_{t=1}^L P(w_t|\mathbf{x}_{t+1:n};\overset{\leftharpoonup}{\boldsymbol{\theta}}_\text{LSTM}, \boldsymbol{\theta}_\text{out}) \ .
+    \end{align}
+    假设词表大小为 $N$, 第 $t$ 个单词 $w_t$ 可以看作词表中的某一个类别.
+\end{enumerate}}
+
+\textbf{\large 解:}
+\begin{enumerate}
+    \item % your solution here
+    \item % your solution here
+    \item % your solution here
+    \item % your solution here
+\end{enumerate}
+
+\section{预训练微调范式 (30 points)}
+\label{sec:ii}
+
+{\color{gray}\begin{enumerate}
+    \item 什么是预训练微调范式? \points{2} 预训练微调范式相比 ``从零开始训练 (training from scratch)" 的优势在哪里? \points{4}
+    \item 在预训练阶段, 通常使用自监督学习范式训练模型. 什么是自监督学习? \points{2} 使用自监督学习进行预训练的优势是什么? \points{2}
+    \item 微调阶段有两种常见策略: (1) 冻结预训练参数只训练输出头; (2) 不冻结预训练参数而训练整个模型 (全量微调). 分析并判断哪一种策略可以防止在少样本微调下的过拟合问题. \points{3} 分析并判断哪一种策略的训练成本更高. \points{3}
+    \item 请基于 BERT 预训练模型 \texttt{bert-mini-uncased} 在 \texttt{Yelp Reviews} 数据集上微调文本分类模型. 相关的代码, 数据集和参考代码可从以下链接下载. 如果受限于设备, 可以使用使用较小规模的数据集进行训练或测试. 
+    
+    \url{https://box.nju.edu.cn/d/186680aa6273470399db/}
+
+    给出的参考代码实现了全量微调, 请运行代码并给出微调过程中各个 epoch 在测试集上的实验结果. \points{2}
+    尝试修改代码实现冻结预训练参数的微调, 请解释修改的代码, 并与全量微调的实验结果做比较. \points{6}
+    尝试修改代码实现 ``从零开始训练 (training from scratch)", 请解释修改的代码, 并与全量微调的实验结果做比较. \points{6}
+\end{enumerate}}
+
+\textbf{\large 解:}
+\begin{enumerate}
+    \item % your solution here
+    \item % your solution here
+    \item % your solution here
+    \item % your solution here
+\end{enumerate}
+
+\vspace{12em}
+
+\section{预训练语言模型 (24 points)}
+
+{\color{gray}\begin{enumerate}
+    \item BERT 和 GPT 使用的预训练任务分别是什么? \points{3} BERT 和 GPT 在网络结构上的主要区别是什么? \points{2} BERT 和 GPT 分别适合什么样的下游任务? \points{2}
+    \item 基于 Transformers 架构的语言模型 (例如: BERT 和 GPT) 需要引入位置编码. 请从 Attention 机制的角度解释位置编码的必要性. \points{2} BERT 和 GPT 使用可训练的位置向量作为位置编码. 一般认为这种绝对位置编码的缺点是没有外推性, 请解释原因. \points{2} 另外一种常见的绝对位置编码形式, 即 Sinusoidal 位置编码:
+    \begin{equation}
+    \left\{
+    \begin{aligned}
+    &\boldsymbol{p}_{k, 2i} = \sin\Big( k/10000^{2i/d} \Big) \\ 
+    &\boldsymbol{p}_{k, 2i+1} = \cos\Big( k/10000^{2i/d} \Big) 
+    \end{aligned}
+    \right. \ .
+    \end{equation} 
+    其中, $\boldsymbol{p}_{k, 2i}$ 和 $\boldsymbol{p}_{k, 2i+1}$ 表示位置 $k$ 的编码向量的第 $2i$ 和 $2i+1$ 个分量; $d$ 为位置向量的维度. 由于位置 $k_1+k_2$ 的向量可以表示成位置 $k_1$ 和位置 $k_2$ 的向量组合，所以 Sinusoidal 位置编码可能可以表达相对位置信息. 请推导这种位置向量组合的具体形式. \points{3}
+
+    \textbf{[提示 3]} $\sin(\alpha+\beta) = \sin\alpha\cos\beta+\cos\alpha\sin\beta$ , $\cos(\alpha+\beta) = \sin\alpha\sin\beta-\cos\alpha\cos\beta$ .
+    
+    \item 双向注意力和因果注意力在 BERT 和 GPT 中发挥着重要作用. 在 PyTorch 库中, 可以通过注意力接口函数 \texttt{torch.nn.functional.scaled\_dot\_product\_attention()} 配合使用 Attention Mask 来实现对应的注意力机制. 双向注意力和因果注意力分别使用什么形式的 Attention Mask? \points{2} 
+    \item 假设一个语言模型需要编码一句问答文本 [``What'', ``is", ``your", ``name", ``?", ``My", ``name", ``is", ``Zhang", ``San", ``."]. 这段问答文本一共有 10 个 token, 其中问题有 5 个 token, 回答有 5 个 token. 对应的 Attention Mask 是一个 $10\times 10$ 的矩阵. 如果语言模型使用双向自注意力, 请写出 Attention Mask 矩阵. \points{2} 如果语言模型使用因果自注意力, 请写出 Attention Mask 矩阵. \points{2} 现在需要设计一种特殊的自注意力机制, 使得问题中的某个 token 只可以``注意"到之前的问题 token, 回答中的某个 token 可以``注意"到所有的问题 token和所有的回答 token. 请写出这种自注意力机制的 Attention Mask 矩阵. \points{4}
+\end{enumerate}}
+
+\textbf{\large 解:}
+\begin{enumerate}
+    \item % your solution here
+    \item % your solution here
+    \item % your solution here
+    \item % your solution here
+\end{enumerate}
+
+\section{模型蒸馏 (24 points)}
+
+{\color{gray}\begin{enumerate}
+    \item 什么是模型蒸馏? \points{2} 为什么需要模型蒸馏? \points{4}
+    \item 在 DistilBERT 中, 硬标签损失和软标签损失分别是什么? \points{2} 如果使用的数据集中无标签, 该如何设计蒸馏损失? \points{4}
+    \item 将题目 \ref{sec:ii} 中微调后的文本分类模型作为教师模型, 仅使用软标签损失作为蒸馏损失将其知识蒸馏到一个较小的模型 \texttt{bert-tiny-uncased} (该模型也包含在链接中) 中. 请提供关键代码和实验结果. \points{12}
+\end{enumerate}}
+
+\textbf{\large 解:}
+\begin{enumerate}
+    \item % your solution here
+    \item % your solution here
+    \item % your solution here
+\end{enumerate}
+
+\end{document}
+

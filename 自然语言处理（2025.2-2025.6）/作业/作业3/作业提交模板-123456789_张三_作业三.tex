@@ -1,0 +1,146 @@
+%\documentclass[a4paper]{article}
+%\usepackage{geometry}
+%\geometry{a4paper,scale=0.8}
+\documentclass[8pt]{article}
+\usepackage{ctex}
+\usepackage{indentfirst}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage[a4paper, total={6in, 8in}]{geometry}
+\usepackage{CJK}
+\usepackage[fleqn]{amsmath}
+\usepackage{parskip}
+\usepackage{listings}
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+
+% 设置页眉
+\fancyhead[L]{2025年春季}
+\fancyhead[C]{自然语言处理}
+\fancyhead[R]{作业三}
+
+
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{multicol}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{xcolor}
+
+
+\begin{document}
+
+\textbf{\color{blue} \Large 姓名：张三 \ \ \ 学号：123456789 \ \ \ \today}
+
+
+\section*{一. (35 points) 信息抽取}
+1. 除了序列标注，成分句法分析，状态转移和基于跨度四种方法外，请设计另外一种方法来处理嵌套命名实体识别。 (3 points)
+
+2. 对于命名实体识别，有些实体可能是不连续的，被称为不连续命名实体识别（Discontinuous NER）。请设计两种模式来提取这种不连续的实体。 (5 points)
+
+3. 请设计一个朴素的方案（比如利用一个朴素的提示）和一个更有效的策略利用GPT等黑盒大语言模型进行关系抽取。 (7 points)
+
+4. 对于关系分类任务，即对两个实体的关系进行分类，一个简单的方法是我们基于BERT等预训练模型拼接两个实体的表示得到关系向量并且进行分类。请设计三种策略对该方案进行改进。注意：使用更强的预训练模型不得分。 (10 points)
+
+5. 开放信息提取中，SelfORE有哪些不足？基于这些不足，你可以设计什么策略或者新方法来更好地完成开放信息提取？ (10 points)
+
+
+
+\textbf{\large 解:}
+\vspace{8em}
+\vspace{8em}
+\par
+
+
+
+
+\section*{二. (40 points)机器翻译}
+\subsection*{基础任务 (20 points)}
+1. 使用 HuggingFace 的 MarianMTModel 或 transformers 中的其他翻译模型，构建一个英文-中文的翻译系统。要求实现以下内容： (10 points)
+\begin{itemize}
+    \item 输入一个英文句子，输出中文翻译
+    \item 能处理批量翻译（batch）
+    \item 使用 BLEU 得分在一个公开小数据集（如 WMT20 small、Tatoeba 等）上进行评估
+\end{itemize}
+2. 请展示3-5个例子并进行人工与BLEU对比分析。 (5 points)
+
+3. BLEU评估有什么缺点，具体说明至少2个缺点。 (5 points)
+
+\subsection*{改进与探索 (20 points)}
+4. 模拟低资源情境（如仅使用500-1000句训练数据），并尝试使用数据增强技术（如回译、噪声增强等）来提升性能。分析增强前后模型的BLEU变化与翻译质量。写下你的实现过程、结果及分析
+
+\textbf{\large 解:}
+\vspace{8em}
+\vspace{8em}
+\par
+
+
+
+
+
+
+\section*{三. (25 points) 情感分析}
+\subsection*{基础任务 (15 points)}
+请使用ChatGPT(豆包、DeepSeek等)，完成属性级情感分析任务。给定一条中文评论，要求模型识别出其中提及的属性（如“食物”、“服务”等），并判断这些属性的情感极性（正面、负面、中性）。
+
+示例评论：
+
+这家餐厅的食物很好吃，但是价格有点贵。
+
+示例输出格式：
+
+\{
+  "食物": "正面",
+  "价格": "负面"
+\}
+
+请完成以下内容：
+
+1. 说明你对ABSA任务的理解（什么是“属性”和“情感”）。 (4 points)
+
+2. 设计并展示你用于调用模型的提示词（Prompt）。 (4 points)
+
+3. 使用至少5条指定评论运行你的Prompt，并展示模型输出结果。 (3 points)
+
+4. 简要分析模型结果表现好/差的情况及原因。 (4 points)
+
+\subsection*{进阶探索 (10 points)}
+5. 在基础任务的基础上，尝试提升模型在ABSA任务上的表现。除了改进Prompt设计外，你还可以从以下方面进行探索：
+\begin{itemize}
+    \item 思维链提示（Chain-of-Thought）：引导模型“先分析句子结构→再提取属性→再判断情感”
+    \item Few-shot学习：给模型几个手工构造的“评论→输出”示例，帮助其学习格式和规律
+    \item 结构化输出约束：在Prompt中明确要求“输出为JSON格式”，减少错误输出
+    \item 后处理规则：用代码或正则对模型输出进行清洗、修正、补充
+    \item 任务拆分：先用模型抽属性，再逐个问每个属性的情感（两步走方案）
+    \item 模型比较：对比不同平台或不同prompt方案的差异
+\end{itemize}
+要求：
+\begin{itemize}
+    \item 展示你使用的提升方法和示例
+    \item 对比基础方案与改进方案的结果差异
+    \item 反思哪种策略更有效，是否值得推广
+\end{itemize}
+
+
+数据（可直接使用）：
+
+评论1：这家餐厅的食物很好吃，但是价格有点贵。  
+
+评论2：服务员态度非常好，就是上菜速度太慢了。  
+
+评论3：环境不错，灯光也很有氛围，就是位置偏了点。  
+
+评论4：味道一般，价格还算合理。  
+
+评论5：排队太久了，但食物真的物有所值。
+
+\textbf{\large 解:}
+
+\vspace{8em}
+
+\par
+
+
+
+\end{document}

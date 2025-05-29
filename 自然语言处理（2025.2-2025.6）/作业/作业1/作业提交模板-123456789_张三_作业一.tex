@@ -1,0 +1,135 @@
+%\documentclass[a4paper]{article}
+%\usepackage{geometry}
+%\geometry{a4paper,scale=0.8}
+\documentclass[8pt]{article}
+\usepackage{ctex}
+\usepackage{indentfirst}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage[a4paper, total={6in, 8in}]{geometry}
+\usepackage{CJK}
+\usepackage[fleqn]{amsmath}
+\usepackage{parskip}
+\usepackage{listings}
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+
+% 设置页眉
+\fancyhead[L]{2025年春季}
+\fancyhead[C]{自然语言处理}
+\fancyhead[R]{作业一}
+
+
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{multicol}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{xcolor}
+
+
+\begin{document}
+
+\textbf{\color{blue} \Large 姓名：张三 \ \ \ 学号：123456789 \ \ \ \today}
+
+
+\section*{一. (20 points) NLP基础}
+1. RNN和Transformer 在处理序列数据时的主要机制是什么? (3 points)
+
+2. 为什么Transformer在处理长序列时通常优于传统RNN（如LSTM/GRU）？给出具体解释。 (3 points)
+
+3. 从计算效率角度，分析Transformer相对于RNN的优势和劣势。 (4 points)
+
+4. 针对RNN和Transformer，各举一个更适合的应用场景，并说明原因。 (4 points)
+
+5. 单塔模型和双塔模型各自的优缺点是什么？ (3 points)
+
+6. BLEU作为度量指标有哪些缺陷？ (3 points)
+
+\textbf{\large 解:}
+\vspace{15em}
+
+
+
+
+\par
+
+
+\section*{二. (35 points) Transformer}
+1. 一层Transformer中都有哪些模块包含参数？ (2 points)
+
+2. 给定如下Transformer，给定维度$d_{model}=512$，FFN中间层维度$d_{ff}=2048$，头数$h=8$，头维$d_q=d_k=d_v=64$，求Transformer一层的参数量有多少。 (3 points)
+
+3. 通常，我们可以将Transformer的FFN表示成如下形式：
+
+\[
+FF(\mathbf{x})=f(\mathbf{x}\cdot W_1+b_1)\cdot W_2+b_2
+\]
+
+在Memory Network(MN)中，一个neural memory中有$d_m$个key-value pair，我们称之为memory，每一个键我们用$k_i\in\mathbb{R}^d$表示，总共我们可以得到一个参数矩阵$K\in\mathbb{R}^{d_m\times d}$。同理，我们可以得到值的参数矩阵$V\in\mathbb{R}^{d_m\times d}$。给定一个输入向量$\mathbf{x} \in \mathbb{R}^{d}$，我们可以计算key的分布，然后计算输出：
+\[
+p(k_i \mid x) \propto \exp(\mathbf{x}\cdot \mathbf{k}_i)
+\]
+\[
+\text{MN}(\mathbf{x}) = \sum_{i=1}^{d_m}p(k_i|\mathbf{x})\mathbf{v_i}
+\]
+上述过程，写成矩阵的形式为：
+\[
+MN(\mathbf{x})=softmax(\mathbf{\mathbf{x} \cdot K^\top})\cdot V
+\]
+
+因此，忽略FFN中的偏置后，我们可以从另外一个角度看待FFN。Transformer中的FFN可以看做是一种储存了知识的memory network。请推导出他们二者之间的联系。 (10 points)
+
+
+4. Transformer架构具有多头注意力机制。他们将其描述为一种拼接过程，用于在每一层中并行地为多个“头”（ $head_j \in \mathbb{R}^d, j \leq J $）执行注意力函数。核心公式如下：
+\[
+\text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}_1, ..., \text{head}_h)W^{O}
+\]
+\[
+\text{where } \text{head}_j = \text{Attention}(QW_j^{Q}, KW_j^{K}, VW_j^{V}) 
+\]
+实际上，我们也可以将多头注意力的结果看成是多个头的结果的累加，即每个$\text{head}_j$与矩阵中一部分$W^{O}$乘积并累加的结果。
+请你尝试推导。[提示：从分块矩阵的角度出发] (10 points)
+
+
+5. 忽略Transformer架构中的LayerNorm，用MHA表示多头注意力机制，FFN表示前馈神经网络，给定Transformer第$l$层输入$x^l$，那么第$l$层的输出是什么？答案示例：$MHA(x^l) + FFN(x^l)$。[提示：不要忘记残差流] (10 points)
+
+\textbf{\large 解:}
+\vspace{10em}
+
+
+\par
+
+
+
+\section*{三. (20 points) 神经网络和注意力机制的实现}
+给定一个批次的序列输入 input = torch.Tensor(32, 100, 500)，其中32表示批次大小，100表示序列长度，而500表示维度数。
+
+1. 请学习pytorch中关于卷积层，LSTM以及Transformer编码器的接口，即nn.LSTM()等。请依次定义上面三个神经网络让其接受input为输出，输出一个跟input同等形状的tensor。 (10 points)
+
+2. 请实现任意两种注意力机制，对该序列输入进行聚合，得到一个新的聚合后的tensor，该tensor的形状为(32,500)。 (10 points)
+
+\textbf{\large 解:}
+
+\vspace{10em}
+
+\par
+
+
+\section*{四. (25 points) 词嵌入}
+本题探索词嵌入并且用词嵌入进行文本分类。
+
+1. 请解释Word2vec中CBOW和Skip-gram两种模型的区别，并说明各自的适用场景。 (5 points)
+
+2. 请基于词嵌入（如Glove 50d）和机器学习分类器（如SVM等）对AG news数据集进行文本分类。
+请提供代码并且给出在测试集上的分类结果。代码应包括加载词嵌入，文本到词嵌入的映射，训练分类器。
+如果受限于设备，可以使用一部分数据集进行训练。 (12 points)
+
+3. 在仍然只使用该词嵌入和分类器的情况下，有没有什么方法可以提升性能并且验证。 (8 points)
+\textbf{\large 解:}
+
+\vspace{10em}
+
+\end{document}
+
