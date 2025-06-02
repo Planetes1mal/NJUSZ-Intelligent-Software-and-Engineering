@@ -1,0 +1,104 @@
+# 操作系统生成的文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE和编辑器文件
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# 编译产物和临时文件
+*.class
+*.o
+*.pyc
+__pycache__/
+*.so
+*.exe
+*.dll
+*.dylib
+build/
+dist/
+target/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python
+*.py[cod]
+*$py.class
+.Python
+env/
+venv/
+.env/
+.venv/
+pip-log.txt
+.pytest_cache/
+.coverage
+htmlcov/
+
+# C/C++
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+*.log
+target/
+.mvn/
+
+# 压缩文件
+*.zip
+*.rar
+*.7z
+*.gz
+*.tar
+*.tgz
+
+# 日志文件
+*.log
+logs/
+log/
+
+# 临时文件
+*.tmp
+*.temp
+*.swp
+*~
+
+# 数据库文件
+*.sqlite
+*.db
+*.sqlite3
+
+# 本地配置文件
+config.local.js
+application.local.properties
+*.local.json
+
+# 文档生成的临时文件
+_book/
+.docusaurus
+
+# LaTeX临时文件
+*.aux
+*.bbl
+*.blg
+*.out
+*.toc
+*.lot
+*.lof
+*.log
+*.fls
+*.fdb_latexmk
+*.synctex.gz
