@@ -1,0 +1,174 @@
+%\documentclass[a4paper]{article}
+%\usepackage{geometry}
+%\geometry{a4paper,scale=0.8}
+\documentclass[8pt]{article}
+\usepackage{ctex}
+\usepackage{indentfirst}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage[a4paper, total={6in, 8in}]{geometry}
+\usepackage{CJK}
+\usepackage[fleqn]{amsmath}
+\usepackage{parskip}
+\usepackage{listings}
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+
+% 设置页眉
+\fancyhead[L]{2025年春季}
+\fancyhead[C]{自然语言处理}
+\fancyhead[R]{作业四}
+
+
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{multicol}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{hyperref}
+
+\titleformat{\section}
+  {\normalfont\Large\bfseries}
+  {\thesection}{1em}{}
+\renewcommand{\thesection}{\Roman{section}.}
+
+\newcommand{\points}[1]{\textbf{(#1 points)}}
+
+\definecolor{gray}{rgb}{0.5, 0.5, 0.5}
+
+\hypersetup{
+    colorlinks,
+    citecolor=[rgb]{0.00, 0.45, 0.70},
+    linkcolor=[rgb]{0.01, 0.62, 0.45},
+    urlcolor=[rgb]{0.80, 0.47, 0.74},
+}
+
+
+\begin{document}
+
+\textbf{\color{blue} \Large 姓名：张三 \ \ \ 学号：123456789 \ \ \ \today}
+
+\section{FlashAttention \points{23}}
+
+{\color{gray}
+给定一个 Transformer 模型, 其注意力模块的注意力头数为 16, 每个注意力头维度为 $64$.
+给定一个输入, 其序列长度为 2048, batch size 为 4.
+模型参数和输入张量的数据类型为 \texttt{float16} (即每个元素占用 2 字节).
+\begin{enumerate}
+    \item \points{2 + 2} 标准注意力实现需要显式构造注意力得分矩阵 $\mathbf{Q}\mathbf{K}^\top$. 在上述的场景下, 存储该矩阵的张量 \texttt{shape} 是什么? 存储这一张量需要多少显存开销 (单位: MB)? 
+    \item \points{4 + 5} FlashAttention 采用块处理机制来避免显式存储整个 $\mathbf{Q} \mathbf{K}^\top$ 以优化显存使用. 在上述的场景下, 若块大小为 128, 存储该块的张量 \texttt{shape} 是什么? 显存开销是多少 (单位: MB)?
+    \item \points{5 + 5} 在 FlashAttention 的计算过程中, 峰值显存开销来自对以下几个张量的临时存储: (a) Query 块, (b) Key 块, (c) 注意力得分矩阵, (d) Value 块, 和 (e) 输出块. 在上述场景下 (块大小同样为 128), 这些张量的 \texttt{shape} 是什么? 总的峰值显存开销为多少 (单位: MB)?
+\end{enumerate}
+}
+
+\textbf{\large 解:}
+\vspace{7em}
+% your solution here
+
+\section{旋转位置编码 \points{24}}
+\label{sec:ii}
+
+{\color{gray}
+旋转位置编码 (RoPE) 使用对角分块矩阵
+\begin{equation}
+    \boldsymbol{\mathcal{R}}_n = 
+    \left(
+    \begin{array}{cccc}
+        \mathbf{R}_0 & \mathbf{0}   & \cdots & \mathbf{0}         \\
+        \mathbf{0}   & \mathbf{R}_1 & \cdots & \mathbf{0}         \\
+        \vdots       & \vdots       & \ddots & \vdots             \\
+        \mathbf{0}   & \mathbf{0}   & \cdots & \mathbf{R}_{d/2-1} \\
+    \end{array}
+    \right)_{d\times d}
+    \ , \ 
+    \text{where}\ \mathbf{R}_i = \left[
+    \begin{array}{cc}
+        \cos n\theta_i & -\sin n\theta_i \\
+        \sin n\theta_i &  \cos n\theta_i \\
+    \end{array} 
+    \right] \ , 
+\end{equation}
+为 attention 机制中的 query 和 key 注入绝对位置信息, 即 $(\boldsymbol{\mathcal{R}}_m \mathbf{q})^{\top}(\boldsymbol{\mathcal{R}}_n \mathbf{k})$.
+\begin{enumerate}
+    \item \points{7} RoPE 通过绝对位置编码的方式实现了相对位置编码. 请证明 RoPE 的绝对位置信息注入方式具有相对位置编码的效果, 即 $(\boldsymbol{\mathcal{R}}_m \mathbf{q})^{\top}(\boldsymbol{\mathcal{R}}_n \mathbf{k})=\mathbf{q}^{\top}\boldsymbol{\mathcal{R}}_{n-m} \mathbf{k}$. 
+    \item \points{6} 由于 $\boldsymbol{\mathcal{R}}_n$ 的稀疏性, 可以使用逐元素相乘 (element-wise multiplication) 的方式替代矩阵乘法以节省计算资源消耗. 
+    请写出 $\boldsymbol{\mathcal{R}}_n \mathbf{k}$ 对应的逐元素相乘形式的表达式. 
+    (可以使用符号 $\otimes$ 表示逐元素相乘) 
+    \item \points{12} RoPE 具有语义聚合特性, 即语义相似的 token 会被分配与距离无关的更大的注意力. 
+    为形式化描述这一特性，我们作出以下假设和定义：
+    \begin{enumerate}
+        \item 假设 $\mathbf{q}$ 的各个分量独立同分布, 且均服从均值为 $\mu$, 方差为 $\sigma$ 的分布; 
+        \item 定义一个与 $\mathbf{q}$ 语义相似的 key 为 $\tilde{\mathbf{k}} = \mathbf{q} + \boldsymbol{\epsilon}$, 其中 $\boldsymbol{\epsilon}$ 为均值为 $0$, 方差为 $1$ 的扰动;
+        \item 定义一个与 $\mathbf{q}$ 语义不相似的 key $\mathbf{k}$, 其与 $\mathbf{q}$ 独立同分布, 即 $\mathbf{k}$ 的各个分量独立同分布, 且均服从均值为 $\mu$, 方差为 $\sigma$ 的分布.
+    \end{enumerate}
+    基于上述假设和定义, RoPE 的语义聚合特性可以表示为 $\mathbb{E}_{\mathbf{q}, \mathbf{k}, \boldsymbol{\epsilon}} 
+    \big[
+        \mathbf{q}^{\top} \boldsymbol{\mathcal{R}}_{n-m} \tilde{\mathbf{k}} 
+        - 
+        \mathbf{q}^{\top} \boldsymbol{\mathcal{R}}_{n-m} \mathbf{k}
+    \big] \geq 0 $, 即从统计意义上看, 语义相似的 token 之间的注意力 $\mathbf{q}^{\top} \boldsymbol{\mathcal{R}}_{n-m} \tilde{\mathbf{k}} $ 比语义不相似的 token 之间的注意力 $\mathbf{q}^{\top} \boldsymbol{\mathcal{R}}_{n-m} \mathbf{k}$ 更大.
+    请证明
+    \begin{equation}
+        \mathbb{E}_{\mathbf{q}, \mathbf{k}, \boldsymbol{\epsilon}} 
+        \big[
+        \mathbf{q}^{\top} \boldsymbol{\mathcal{R}}_{n-m} \tilde{\mathbf{k}} 
+        - 
+        \mathbf{q}^{\top} \boldsymbol{\mathcal{R}}_{n-m} \mathbf{k}
+        \big] \geq 0 
+        \ \ \ \  \text{s.t.} \ \ \ 
+        \sum_{i=0}^{d/2-1} \cos (n-m)\theta_i \geq 0 \ .
+    \end{equation} 
+\end{enumerate}
+}
+
+\textbf{\large 解:}
+\vspace{7em}
+% your solution here
+
+\section{LoRA \points{23}}
+
+{\color{gray}
+对于预训练权重矩阵 $\mathbf{W}_0\in\mathbb{R}^{m\times n}$, LoRA 不直接微调权重矩阵, 而是对权重增量做低秩分解假设 $\mathbf{W}=\mathbf{W}_0+\mathbf{A}\mathbf{B}$, 其中, $\mathbf{A}\in\mathbb{R}^{m\times r}$, $\mathbf{B}\in\mathbb{R}^{r \times n}$.
+\begin{enumerate}
+    \item \points{5} 若 $m=n=768$, $r=8$, 请计算相比全参数微调, LoRA 节省了多少参数. 
+    \item \points{18} 请基于 PyTorch 的 \texttt{nn.Linear}, 实现支持 LoRA 的线形层 \texttt{LoraLinear} 并给出代码. 要求: (a) 类名为 \texttt{LoraLinear}, 继承自 \texttt{nn.Linear}; (b) 对 $\mathbf{A}$ 和 $\mathbf{B}$ 的初始化; (c) \texttt{forward} 函数实现 $\mathbf{x}\mathbf{W}=\mathbf{x}\mathbf{W}_0+\mathbf{x}\mathbf{A}\mathbf{B}$; (d) 实现参数合并功能, 即将 $\mathbf{A}$ 和 $\mathbf{B}$ 融合进入 $\mathbf{W}_0$ 中. 
+\end{enumerate}
+}
+
+\textbf{\large 解:}
+\vspace{8em}
+% your solution here
+
+\section{跨语言问答系统设计 \points{18}}
+
+{\color{gray}
+你需要为一种语料资源极少的语言 (如: 约鲁巴语) 开发问答系统. 
+该语言缺乏问答标注数据, 仅有 (a) 少量未标注的约鲁巴语文本, (b) 少量英语-约鲁巴语平行句对, 和 (c) 英语大规模问答数据 (如: SQuAD).
+系统的目标功能是: 输入英文问题，模型从约鲁巴语文章中抽取答案作为回答.
+
+\points{20} 请结合翻译语言模型 (TLM) 或零样本迁移等技术，给出训练这一模型的流程.
+需要综合考虑包括数据构造与预处理, 训练目标及策略, 以及模型微调等方面可能遇到的问题.
+}
+
+\textbf{\large 解:}
+\vspace{8em}
+% your solution here
+
+\section{LLMs 评估 \points{12}}
+
+{\color{gray}
+大语言模型常被用作 ``自动评分器" 来评估其他模型的文本生成质量 (如: 使用 GPT-4 为 LLaMa-3.1 的生成结果打分). 请回答以下问题:
+\begin{enumerate}
+    \item \points{4} 简要分析该方法的优势与局限性，特别是在数学推理任务和长文本生成任务中的表现.
+    \item \points{8} 请提出一个改进方案, 能够提升模型作为评估器的准确性和可靠性. 可以从 prompt 工程, 任务分解, 答案格式规范化等角度切入, 并说明你会如何评估你提出方法的有效性.
+\end{enumerate}
+}
+
+\textbf{\large 解:}
+% your solution here
+
+\end{document}
+
